@@ -1,0 +1,147 @@
+AngularJS 在实际应用中有哪些优缺点？
+
+优点：
+1. 模板功能强大丰富，并且是声明式的，自带了丰富的Angular指令；
+2. 是一个比较完善的前端MV*框架，包含模板，数据双向绑定，路由，模块化，服务，过滤器，依赖注入等所有功能；
+3. 自定义Directive，比jQuery插件还灵活，但是需要深入了解Directive的一些特性，简单的封装容易，复杂一点官方没有提供详细的介绍文档，我们可以通过阅读源代码来找到某些我们需要的东西，如：在directive使用 $parse；
+4. ng模块化比较大胆的引入了Java的一些东西（依赖注入），能够很容易的写出可复用的代码，对于敏捷开发的团队来说非常有帮助，我们的项目从上线到目前，UI变化很大，在摸索中迭代产品，但是js的代码基本上很少改动。
+5. 补充：Angular支持单元测试和e2e-testing。
+
+缺点：
+1. 验证功能错误信息显示比较薄弱，需要写很多模板标签，没有jQuery Validate方便，所以我们自己封装了验证的错误信息提示，详细参考 why520crazy/w5c-validator-angular · GitHub ；
+2. ngView只能有一个，不能嵌套多个视图，虽然有 angular-ui/ui-router · GitHub 解决，但是貌似ui-router 对于URL的控制不是很灵活，必须是嵌套式的（也许我没有深入了解或者新版本有改进）；
+3. 对于特别复杂的应用场景，貌似性能有点问题，特别是在Windows下使用chrome浏览器，不知道是内存泄漏了还是什么其他问题，没有找到好的解决方案，奇怪的是在IE10下反而很快，对此还在观察中；
+4. 这次从1.0.X升级到1.2.X，貌似有比较大的调整，没有完美兼容低版本，升级之后可能会导致一个兼容性的BUG，具体详细信息参考官方文档 AngularJS ，对应的中文版本：Angular 1.0到1.2 迁移指南
+5. ng提倡在控制器里面不要有操作DOM的代码，对于一些jQuery 插件的使用，如果想不破坏代码的整洁性，需要写一些directive去封装插件，但是现在有很多插件的版本已经支持Angular了，如：jQuery File Upload Demo
+6. Angular 太笨重了，没有让用户选择一个轻量级的版本，当然1.2.X后，Angular也在做一些更改，比如把route，animate等模块独立出去，让用户自己去选择。
+
+
+
+js 如何写递归函数
+
+
+js 如何写递归函数？用 arguments.callee，它指向正在执行的函数，arguments.callee 返回正在被执行的对象。 
+
+function fact(num) {
+  if (num <= 1) {
+    return 1;
+  } else {
+     return num * arguments.callee(num - 1); //js 函数递归调用 
+  }
+}
+  
+var anotherFact = fact;
+alert(antherFact(4));    //结果为24
+
+
+
+
+ES6的promise和await 
+
+
+
+Promise对象
+
+Promise对象包含三个状态属性
+
+pending即正在加载
+
+resolved加载成功
+
+rejected加载失败
+
+切换状态的函数为resolve和reject
+
+针对不同的状态属性，Promise会跳转到不同事件列表，事件列表可以通过Promise.done/fail/then/always设置。
+
+done: 向doneList中添加一个成功回调函数
+
+fail: 向failList中添加一个失败回调函数
+
+then: 分别向doneList和failList中添加回调函数
+
+always: 添加一个无论成功还是失败都会调用的回调函数
+
+var promise = new Promise(function(resolve, reject) {
+  // 这里写业务逻辑
+
+  if (/* 异步操作成功 */){
+    resolve();
+    //resolve将promise的状态从pending改为resolved
+  } else {
+    reject();
+    //reject将promise的状态从pending改为rejected
+  }
+});
+
+//then用于向promise的事件列表中添加事件
+//第一个参数为状态为resolved时执行的事件列表
+//第二个参数为状态为rejected时执行的事件列表
+promise.then(function(value) {
+  // success
+}, function(error) {
+  // failure
+});
+异步函数和等待
+
+async 可以声明一个异步函数，此函数需要返回一个 Promise 对象。
+
+await 则等待一个 Promise 对象状态转换为resolved，并拿到结果。
+
+async function sleep(timeout) {
+  //此处返回Promise对象
+  return new Promise((resolve, reject) => {
+    setTimeout(function() {
+      resolve();
+    }, timeout);
+  });
+}
+
+(async function() {
+  console.log('Do some thing, ' + new Date());
+  //这里的await会监听Promise对象的状态属性，直到对象状态转换为resolved才会运行下面的代码
+  await sleep(3000);
+  console.log('Do other things, ' + new Date());
+})();
+顺序执行查方案一
+
+var promise = new Promise(function(resolve, reject) {
+  // 这里实现A
+
+  if (/* 异步操作成功 */){
+    resolve();
+  } else {
+    reject();
+  }
+});
+
+//这里实现B
+new promise.done(B);
+顺序执行查方案二
+
+async function A() {
+  //这里实现A
+  return new Promise((resolve, reject) => {
+      if (/* 异步操作成功 */){
+        resolve();
+      } else {
+        reject();
+      }
+  });
+}
+
+async function B() {
+  //这里实现B
+  return new Promise((resolve, reject) => {
+      if (/* 异步操作成功 */){
+        resolve();
+      } else {
+        reject();
+      }
+  });
+}
+
+(async function() {
+  await A();
+  await B();
+})();

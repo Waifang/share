@@ -1,0 +1,287 @@
+<script>
+function getCookie(name) {
+    var reg = new RegExp('(^| )' + name + '=([^;]*)(;|$)');
+    var arr = document.cookie.match(reg);
+    return arr ? unescape(arr[2]) : arr;
+}
+
+function getParameter(name) {
+    var reg = new RegExp(
+        '(^|&)' + name + '=([^&]*)(&|$)',
+        'i'
+    );
+    var r = window.location.search.substr(1).match(reg);
+    return r != null ? unescape(r[2]) : null;
+}
+
+function isPhoneNumber(val) {
+    return /^1\d{10}$/.test(val);
+}
+
+function version_compare(version1, version2) {
+    version2 += '';
+    version1 += '';
+
+    var a = version1.split('.'),
+        b = version2.split('.'),
+        i = 0,
+        len = Math.max(a.length, b.length);
+
+    for (; i < len; i++) {
+        if ((a[i] && !b[i] && parseInt(a[i]) > 0) || (parseInt(a[i]) > parseInt(b[i]))) {
+            return 1;
+        } else if ((b[i] && !a[i] && parseInt(b[i]) > 0) || (parseInt(a[i]) < parseInt(b[i]))) {
+            return -1;
+        }
+    }
+    return 0;
+};
+
+function isShoubai() {
+    var ua = navigator.userAgent;
+    var isBox = / baiduboxapp\//i.test(ua) && !/ lite baiduboxapp/.test(ua) && !/ info baiduboxapp/.test(ua);
+    return isBox ? 'shoubai' : '';
+}
+
+function isWangpan() {
+    var ua = navigator.userAgent;
+    var isBox = /netdisk;/i.test(ua);
+    return  isBox ? 'wangpan' : '';
+}
+
+function isHaokan() {
+    var ua = navigator.userAgent;
+    var isBox = / haokan\//i.test(ua);
+    return isBox ? 'haokan' : '';
+}
+
+function shoubaiVersion() {
+    var back = 0;
+    if (isShoubai()) {
+        var str = navigator.userAgent;
+        var a;
+        if (a = /([\d+.]+)_(?:diordna|enohpi)_/.exec(str)) {
+          a = a[1].split('.');
+          back = a.reverse().join('.');
+        }
+        else if (a = /baiduboxapp\/([\d+.]+)/.exec(str)) {
+          back = a[1];
+        }
+    }
+    return back;
+}
+
+function haokanVersion() {
+    var match = navigator.userAgent.match(/ haokan\/(.+?) /);
+    return match ? match[1] : 0;
+}
+
+function wangpanVersion() {
+    var match = navigator.userAgent.match(/netdisk;(.+?);/);
+    return match ? match[1] : 0;
+}
+
+
+var APP_INFO = {
+    shoubai: {
+        appname: 'shoubai',
+        cuid:'BAIDUCUID',
+        appid: '0001',
+        version: '8.3.5',
+        version2: shoubaiVersion()
+    },
+    wangpan: {
+        appname: 'wangpan',
+        cuid: 'BAIDUCUID',
+        appid: '0004',
+        version: '7.0.0',
+        version2: wangpanVersion()
+    },
+    haokan: {
+        appname: 'haokan',
+        cuid: 'BAIDUCUID',
+        appid: '0005',
+        version: '1.0.0',
+        version2: haokanVersion()
+    }
+};
+
+var AJAX_URL = {
+    bindstatus: {
+        url: 'http://yf-lbs-redistest00.yf01.baidu.com:8712/devbind/status',
+        method: 'get'
+    },
+    bind: {
+        url: 'http://yf-lbs-redistest00.yf01.baidu.com:8712/devbind/bind',
+        method: 'get'
+    },
+    unbind: {
+        url: 'http://yf-lbs-redistest00.yf01.baidu.com:8712/devbind/unbind',
+        method: 'get'
+    },
+    smscode: {
+        url: 'http://yf-lbs-redistest00.yf01.baidu.com:8712/devbind/getsms',
+        method: 'get'
+    }
+};
+
+legend.ready(function () {
+    var bind = legend.getComponentsByName('bind')[0];
+    var unbind = legend.getComponentsByName('unbind')[0];
+    var unarea = legend.getComponentsByName('unarea')[0];
+    var update = legend.getComponentsByName('update')[0];
+    var unrecord = legend.getComponentsByName('unrecord')[0];
+    var bindmobile = legend.getComponentsByName('bindmobile')[0];
+    var bindmobileInput = $(bindmobile.surfaceElement).find('input');
+    var unbindmobile = legend.getComponentsByName('unbindmobile')[0];
+    var unbindmobileInput = '';
+    var unBindSubmit = legend.getComponentsByName('unbindtwosure')[0];
+    var bindSubmit = legend.getComponentsByName('bindSubmit')[0];
+    var smscode = legend.getComponentsByName('smscode')[0];
+    var codeSubmit = legend.getComponentsByName('codeSubmit')[0];
+    var bindStatus = legend.getComponentsByName('bindStatus')[0];
+
+    var appName = isShoubai() || isWangpan() || isHaokan();
+    if (appName) {
+        var appInfo = APP_INFO[appName];
+        var cuidVal = getCookie(appInfo.cuid);
+        var appid = appInfo.appid;
+        var version1 = appInfo.version;
+        var version2 = appInfo.version2;
+        var version = version_compare(version2,version1)
+    }
+    if (appName !== 'shoubai' && appName !== 'haokan' && appName !== 'wangpan') {
+        unarea.show();
+    }
+    else if (version < 0) {
+        update.show();
+    }
+    else {
+        if (cuidVal === '' || appName === '' || version2 === '') {
+            unrecord.show();
+        }
+        else {
+            $.ajax({
+                type: AJAX_URL.bindstatus.method,
+                url: AJAX_URL.bindstatus.url,
+                data: {
+                    cuid: cuidVal,
+                    appid: appid,
+                    appName: appName,
+                    version: version
+                },
+                async: false,
+                success: function (res) {
+
+                    if (+res.status === 0) {
+                        bindStatus.show();
+                        if (+res.data.enable === 0) {
+                            bind.show();
+                        }
+                        else {
+                            unbind.show();
+                            unbindmobileInput = res.data.mobile;
+                        }
+                    }
+                    else  {
+                        alert(res.msg || '请求出错，稍后再试~');
+                    }
+                },
+                error: function (res) {
+                    alert(res.msg || '请求出错，稍后再试~');
+                }
+            });
+        }
+     }
+
+
+    // 获取验证码
+    $(codeSubmit.surfaceElement).on('tap',function () {
+        var phoneVal = $.trim(bindmobileInput.val());
+        if (!isPhoneNumber(phoneVal)) {
+            bindmobileInput.val('');
+            return;
+        }
+        $.ajax({
+            type: AJAX_URL.smscode.method,
+            url: AJAX_URL.smscode.url,
+            data:{
+                cuid: cuidVal,
+                appid: appid,
+                mobile: phoneVal
+            },
+            async: false,
+            success: function(res) {
+                if (+res.status !== 0) {
+                    alert(res.msg || '请求出错，稍后再试~');
+                }
+            },
+            error: function(res) {
+                alert(res.msg || '请求出错，稍后再试~');
+            }
+        });
+    })
+
+    // 绑定页面信息提交
+    $(bindSubmit.surfaceElement).on('tap', function () {
+        var phoneVal = $.trim(bindmobileInput.val());
+        if (!isPhoneNumber(phoneVal)) {
+            bindmobileInput.val('');
+            return;
+        }
+        var smscodes = $(smscode.surfaceElement).find('input').val();
+        if ($.trim(smscodes) && phoneVal) {
+            $.ajax({
+                type: AJAX_URL.bind.method,
+                url: AJAX_URL.bind.url,
+                data: {
+                    cuid: cuidVal,
+                    appid: appid,
+                    mobile: phoneVal,
+                    smscode:  smscodes
+                },
+                success: function(res) {
+                    if (+res.status === 0) {
+                        legend.getComponentsByName('bindSuccess')[0].show();
+                    }
+                    else {
+                        alert(res.msg || '请求出错，稍后再试~');
+                    }
+                },
+                error: function(res) {
+                    alert(res.msg || '请求出错，稍后再试~');
+                }
+            });
+        }
+    })
+
+    // 解绑页面信息提交
+    $(unBindSubmit.surfaceElement).on('tap',function () {
+        var phoneVal = unbindmobileInput;
+        if (!isPhoneNumber(phoneVal)) {
+            unbindmobileInput.val('');
+            return;
+        }
+        $.ajax({
+            type: AJAX_URL.unbind.method,
+            url: AJAX_URL.unbind.url,
+            data: {
+                cuid: cuidVal,
+                appid: appid,
+                mobile: phoneVal
+            },
+            success: function(res) {
+                if (+res.status === 0) {
+                    legend.getComponentsByName('unbindSuccess')[0].show();
+                }
+                else {
+                    alert(res.msg || '请求出错，稍后再试~');
+                }
+            },
+            error: function(res) {
+                alert(res.msg || '请求出错，稍后再试~');
+            }
+        });
+    });
+});
+</script>
