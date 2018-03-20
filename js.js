@@ -33,4 +33,56 @@
 
 
 
+监听浏览器后退
+if (window.history && window.history.pushState) {
+    $(window).on('popstate', function() {
+        var hashLocation = location.hash;
+        var hashSplit = hashLocation.split("#!/");
+        var hashName = hashSplit[1];
+
+        if (hashName !== '') {
+            var hash = window.location.hash;
+            if (hash === '') {
+              alert('後退按鈕點擊');
+            }
+        }
+    })
+}
+window.history.pushState('forward', null, '#');
+
+
+改变网页标题得文字
+document.addEventListener("visibilitychange", function(){
+    document.title = document.hidden ? "用户离开了" : "用户回来了";
+});
+
+
+监听pageshow事件阻止页面进入bfcache
+window.addEventListener('pageshow', function(e) {
+    if (e.persisted) {
+        location.reload();
+    }
+})
+
+
+getHash() {
+    // Firefox中直接使用location.hash的返回值会强制进行urldecode，这不是我们所期望的
+    // 兼容的办法是从location.href里手工解
+    var match = location.href.match(/#(.*)$/);
+    var hash = match ? match[0] : '';
+    if (hash.indexOf('#%7C') === 0){
+        // 百度浏览器在内的部分浏览器会把hash自动进行url-encode
+        // %7C就是'|'的url-encode
+        hash = decodeURIComponent(hash);
+    }
+    return hash;
+}
+window.addEventListener('hashchange', function () {
+    if (me.getHash() !== '#view = postinfo' && me.getHash() !== '#view = emainInfo') {
+        location.reload();
+    }
+}, false);
+
+
+
 
