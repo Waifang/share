@@ -1,25 +1,4 @@
 var comm = {
-	tj: function(opt) {
-		var arr = [];
-		var CG = CONFIG || {};
-		opt = opt || {};
-		opt.page = opt.page || CG.page;
-		opt.level = opt.level || CG.level;
-		opt.ver = opt.osName || CG.osName;
-		opt.idfrom = opt.idfrom || CG.idfrom;
-		opt.activity_count = opt.activity_count || CG.activity_count;
-
-	    for (var i in opt) {
-	        opt[i] && arr.push(i + '=' + opt[i]);
-	    }
-	    var list = (arr.length > 0 ? '&' : '') + arr.join('&');
-	    var tj = '/static/tj.gif?' + list + '&t=' + (new Date()).getTime();
-	    (new Image()).src = tj;
-	},
-	/*
-		统计 
-		按钮添加统计的方法：html中设置class=cn_addtj，并且设置data-pos属性
-	*/
  	addTjEvent: function(clsName){
     	var that = this;
     	var clsName = '.' + (clsName || 'cn_addtj');

@@ -1,7 +1,7 @@
 /**
  * @file 简约版轮播插件
- * @author 曹宇
- * @qq 261179233 (听♪心)
+ * @author 
+ * 
  */
 var  $ = require('assets/comm/jquery');
 function Slider($el, options) {

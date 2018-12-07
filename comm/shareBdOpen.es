@@ -1,8 +1,8 @@
 /*
- * @file 手百分享相关
+ * @file 分享相关
 
  * @content
- 	需要引入js：<script src="//s.bdstatic.com/common/openjs/aio.js?v=201602"></script>
+ 	
 */
 // @para conf参数例子
 //var Share = require('assets/comm/share/share');

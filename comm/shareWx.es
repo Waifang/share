@@ -8,10 +8,10 @@
 // @para conf参数例子
 var confDef = {
     options: {
-        title: 'hao123导航-上网从这里开始',
+        title: 'ddd',
         content: '优质中文上网导航，收录全网最新资讯、影视、小说、游戏等。',
         linkUrl: location.href,
-        iconUrl: 'http://m.hao123.com/logo/static/img/hao123-logo300.jpg'
+        iconUrl: 'xxx.jpg'
     },
     jsApiList: ['checkJsApi', 'onMenuShareTimeline', 'onMenuShareAppMessage', 'onMenuShareQQ', 'onMenuShareWeibo', 'onMenuShareQZone'],
     signPackage: {

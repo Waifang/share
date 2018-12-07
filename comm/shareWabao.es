@@ -4,21 +4,21 @@
     
 	var shareConfigDef = {
 	    '0630': {
-	        title: '周末上手机百度看资讯，10元红包天天送！',
-	        content: '手机百度邀你来挖宝，超大红包、流量领不停！手慢无！'
+	        title: 'xx',
+	        content: 'xx'
 	    },
 	    '0701': {
-	        title: '于万千人中遇见你，求带回！',
-	        content: '手机百度邀你来挖宝，超大红包、流量领不停！快寻找属于你的宝箱吧！'
+	        title: 'xx',
+	        content: 'xx'
 	    },
 	    '0702': {
-	        title: '流量用完啦？钱包扁扁的？看这里！',
-	        content: '手机百度邀你来挖宝，超大红包、流量领不停！参与手百挖宝活动，分分钟实现小目标！'
+	        title: 'xx',
+	        content: 'xx'
 	    }
 	}
 	var shareConf = shareConfigDef[CONFIG.today] || shareConfigDef['0630'];
-	shareConf.image = 'http://m.hao123.com/r/image/2017-05-25/037dc447614a393acf0599a1cc9655ff.png';
-	shareConf.url = 'http://wapsite.baidu.com/huodong/wabao/promote?idfrom=share';
+	shareConf.image = 'xx.png';
+	shareConf.url = 'xx';
     var confDef = {
     	options: {
 	        title: shareConf.title,
