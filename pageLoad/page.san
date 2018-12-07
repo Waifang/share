@@ -1,0 +1,64 @@
+<template>
+    <div>
+        <div class="head"></div>
+        <div class="list">
+            <scroller>
+                <p s-for="item, index in list">
+
+                </p>
+            </scroller>
+        </div>
+    </div>
+    
+</template>
+
+<script>
+/**
+ * @file pageLoad
+ * @author Waifang
+ */
+import scrollWrapper from './ScrollWrapper';
+
+async function* getInviteList() {
+    let page = 1;
+    let isLastPage = false;
+    const PAGE_SIZE = 15;
+    while (!isLastPage) {
+        let lastRes = await fly.get('xxx', {
+            'pn': page,
+            'rn': PAGE_SIZE
+        });
+        let Data = lastRes.data.data.list || [];
+        isLastPage = lastRes.length < PAGE_SIZE;
+        page++;
+        yield Data;
+    }
+}
+
+// 合并两个迭代器
+const iterator = getInviteList();
+const Scroller = scrollWrapper(iterator);
+
+export default {
+    inited() {
+    },
+
+    components: {
+        scroller: Scroller
+    },
+
+    attached() {
+        document.addEventListener('scroll', () => {
+            if (scrollY > 0) {
+                // 显示
+            }
+            else {
+                // 隐藏
+            }
+        });
+    }
+};
+</script>
+
+<style lang="stylus">
+</style>
